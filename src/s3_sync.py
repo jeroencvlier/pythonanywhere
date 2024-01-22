@@ -92,8 +92,6 @@ def storage_check():
 
 
 if __name__ == "__main__":
-    # install requirements
-    subprocess.run(["pip", "install", "-r", "requirements.txt"])
     # run the script
     message = aws_sync()
     # check storage
