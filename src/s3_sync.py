@@ -1,7 +1,15 @@
 import subprocess
 import os
-from dotenv import load_dotenv, find_dotenv
 import telegram_bot
+
+
+def count_files_uploaded(output):
+    count = 0
+    lines = output.split("\n")
+    for line in lines:
+        if "upload:" in line:
+            count += 1
+    return count
 
 
 def aws_sync():
@@ -11,7 +19,8 @@ def aws_sync():
     list_of_options_per_week_on_cloud = [
         x for x in list_of_options_per_week_on_cloud if "_week_" in x
     ]
-
+    total_files_uploaded = 0
+    subprocess_errors = ""
     for week in sorted(list_of_options_per_week_on_cloud, reverse=True):
         print(f"Pulling Option Data for {week}!")
         aws_command = [
@@ -30,11 +39,25 @@ def aws_sync():
         ]
 
         try:
-            subprocess.run(aws_command, check=True, text=True)
+            result = subprocess.run(
+                aws_command,
+                check=True,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            )
+            total_files_uploaded += count_files_uploaded(result.stdout)
 
-        except subprocess.CalledProcessError as e:
+        except subprocess.CalledProcessError as error:
             print("Error:")
-            print(e.stderr)
+            print(error.stderr)
+            subprocess_errors += f"Error {week}" + str(error.stderr[:20]) + "\n"
+
+    message = f"Total files uploaded: {total_files_uploaded}"
+    if len(subprocess_errors) > 0:
+        message += "\n" + subprocess_errors
+
+    return message
 
 
 def get_used_space():
@@ -65,15 +88,16 @@ def storage_check():
         print(f"Disk Usage: {percentage_used:.2f}%")
 
     # send telegram message
-    telegram_bot.send_message(f"Disk Usage: {percentage_used:.2f}%")
+    return f"Disk Usage: {percentage_used:.2f}%"
 
 
 if __name__ == "__main__":
-    # load env variables
-    load_dotenv(find_dotenv())
     # install requirements
     subprocess.run(["pip", "install", "-r", "requirements.txt"])
     # run the script
-    aws_sync()
+    message = aws_sync()
     # check storage
-    storage_check()
+    message = storage_check() + "\n" + message
+
+    # send telegram message
+    telegram_bot.send_mess(message)
