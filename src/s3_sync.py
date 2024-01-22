@@ -3,13 +3,17 @@ import os
 import telegram_bot
 
 
+# def count_files_uploaded(output):
+#     count = 0
+#     lines = output.split("\n")
+#     for line in lines:
+#         if "upload:" in line:
+#             count += 1
+#     return count
+
 def count_files_uploaded(output):
-    count = 0
-    lines = output.split("\n")
-    for line in lines:
-        if "upload:" in line:
-            count += 1
-    return count
+    return output.count('upload:')
+
 
 
 def aws_sync():
@@ -51,7 +55,7 @@ def aws_sync():
         except subprocess.CalledProcessError as error:
             print("Error:")
             print(error.stderr)
-            subprocess_errors += f"Error {week}" + str(error.stderr[:20]) + "\n"
+            subprocess_errors += f"Error {week}" + str(error.stderr)[:20] + "\n"
 
     message = f"Total files uploaded: {total_files_uploaded}"
     if len(subprocess_errors) > 0:
