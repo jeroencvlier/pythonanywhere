@@ -42,3 +42,15 @@ except subprocess.CalledProcessError as e:
 except Exception as e:
     print("An error occurred:")
     print(str(e))
+    
+    
+    
+import shutil
+
+# Replace '/' with the path of the disk you want to check, e.g., 'C:\\' on Windows
+total, used, free = shutil.disk_usage("/home/jeroencvlier")
+
+print("Total: %d GiB" % (total // (2**30)))
+print("Used: %d GiB" % (used // (2**30)))
+print("Free: %d GiB" % (free // (2**30)))
+
