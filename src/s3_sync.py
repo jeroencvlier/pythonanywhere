@@ -19,7 +19,7 @@ def count_files_uploaded(output):
 
 
 def aws_sync():
-    week = fetch_weeks_cloud()
+    week = fetch_weeks_cloud(last_week=True)
     total_files_uploaded = 0
     message = f"Pulling Option Data for {week}!"
     print(message)
