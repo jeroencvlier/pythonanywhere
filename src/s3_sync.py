@@ -1,6 +1,8 @@
 import subprocess
 import os
-import telegram_bot
+
+# import telegram_bot
+from src import telegram_bot
 
 
 # def count_files_uploaded(output):
@@ -11,55 +13,61 @@ import telegram_bot
 #             count += 1
 #     return count
 
+
 def count_files_uploaded(output):
-    return output.count('upload:')
+    return output.count("upload:")
 
 
-
-def aws_sync():
-    list_of_options_per_week_on_cloud = os.listdir(
-        "/home/jeroencvlier/option_chain_data/"
-    )
+def fetch_last_week(datapath="/home/jeroencvlier/option_chain_data/"):
+    list_of_options_per_week_on_cloud = os.listdir(datapath)
     list_of_options_per_week_on_cloud = [
         x for x in list_of_options_per_week_on_cloud if "_week_" in x
     ]
+    list_of_options_per_week_on_cloud = sorted(
+        list_of_options_per_week_on_cloud, reverse=True
+    )
+    latest_week = list_of_options_per_week_on_cloud[0]
+
+    return latest_week
+
+
+def aws_sync():
+    week = fetch_last_week()
     total_files_uploaded = 0
     subprocess_errors = ""
-    for week in sorted(list_of_options_per_week_on_cloud, reverse=True):
-        print(f"Pulling Option Data for {week}!")
-        aws_command = [
-            "/home/jeroencvlier/.virtualenvs/awssync/bin/aws",
-            "s3",
-            "sync",
-            f"/home/jeroencvlier/option_chain_data/{week}/",
-            "s3://option-chain-data-backup/option_chain_data",
-            "--size-only",
-            "--exclude",
-            '"*"',
-            "--include",
-            "*.json.gz",
-            "--profile",
-            "default",
-        ]
+    message = f"Pulling Option Data for {week}!"
+    print(message)
+    aws_command = [
+        "/home/jeroencvlier/.virtualenvs/awssync/bin/aws",
+        "s3",
+        "sync",
+        f"/home/jeroencvlier/option_chain_data/{week}/",
+        "s3://option-chain-data-backup/option_chain_data",
+        "--size-only",
+        "--exclude",
+        '"*"',
+        "--include",
+        "*.json.gz",
+        "--profile",
+        "default",
+    ]
 
-        try:
-            result = subprocess.run(
-                aws_command,
-                check=True,
-                text=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-            )
-            total_files_uploaded += count_files_uploaded(result.stdout)
+    try:
+        result = subprocess.run(
+            aws_command,
+            check=True,
+            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+        total_files_uploaded += count_files_uploaded(result.stdout)
 
-        except subprocess.CalledProcessError as error:
-            print("Error:")
-            print(error.stderr)
-            subprocess_errors += f"Error {week}" + str(error.stderr)[:20] + "\n"
+    except subprocess.CalledProcessError as error:
+        print("Error:")
+        print(error.stderr)
+        message += f"\nError: " + str(error.stderr)[:200]
 
     message = f"Total files uploaded: {total_files_uploaded}"
-    if len(subprocess_errors) > 0:
-        message += "\n" + subprocess_errors
 
     return message
 
@@ -92,14 +100,13 @@ def storage_check():
         print(f"Disk Usage: {percentage_used:.2f}%")
 
     # send telegram message
-    return f"Disk Usage: {percentage_used:.2f}%"
+    return f"\nDisk Usage: {percentage_used:.2f}%"
 
 
 if __name__ == "__main__":
     # run the script
     message = aws_sync()
     # check storage
-    message = storage_check() + "\n" + message
-
+    message += storage_check()
     # send telegram message
     telegram_bot.send_mess(message)
