@@ -1,56 +1,41 @@
 import subprocess
+from utils import fetch_weeks_cloud
+import telegram_bot
 
-# Define the remote server and rsync command
-remote_server = "user@remote_server:/path/to/source"
-rsync_command = [
-    "rsync",
-    "-avz",  # Add rsync options as needed (e.g., -a for archive mode, -v for verbose)
-    "--progress",  # Show progress during transfer
-    remote_server,
-    "/path/to/destination",
-]
 
-try:
-    # Run the rsync command
-    result = subprocess.run(rsync_command, capture_output=True, text=True, check=True)
+def local_rsync():
+    last_week = False
+    cloud_weeks = fetch_weeks_cloud(last_week)
 
-    # Get the standard output and standard error
-    stdout = result.stdout
-    stderr = result.stderr
+    for week in cloud_weeks:
+        message = f"Pulling Option Data for {cloud_weeks}!\n"
+        try:
+            result = subprocess.call(
+                [
+                    "rsync",
+                    "-avzhe",
+                    "ssh",
+                    "jeroencvlier@ssh.pythonanywhere.com:/home/jeroencvlier/option_chain_data/"
+                    + week
+                    + "/",
+                    "/Users/jeroenvanlier/Documents/Github/TOS_predition/option_chain_data",
+                ],
+                capture_output=True,
+                text=True,
+            )
+            output = result.stdout
 
-    # Print the standard output and standard error
-    print("Rsync Output:")
-    print(stdout)
-    print("Rsync Error (if any):")
-    print(stderr)
+            # Parse the output for the total number of files transferred
+            for line in output.split("\n"):
+                if "Number of regular files transferred" in line:
+                    total_files = int(line.split(":")[1].strip())
+                    message += f"Total files transferred: {total_files}\n\n"
 
-    # Get available space on the cloud disk
-    df_command = ["df", "-h", "/path/to/cloud/disk"]
-    df_result = subprocess.run(df_command, capture_output=True, text=True, check=True)
+        except Exception as error:
+            message += f"Error: " + str(error.stderr)[:200] + "\n\n"
 
-    # Get available space from df command output
-    available_space = df_result.stdout.splitlines()[1].split()[3]
+    telegram_bot.send_mess(message)
 
-    # Print available space
-    print(f"Available space on cloud disk: {available_space}")
 
-except subprocess.CalledProcessError as e:
-    # Handle any errors here
-    print("Error:")
-    print(e.stderr)
-
-except Exception as e:
-    print("An error occurred:")
-    print(str(e))
-    
-    
-    
-import shutil
-
-# Replace '/' with the path of the disk you want to check, e.g., 'C:\\' on Windows
-total, used, free = shutil.disk_usage("/home/jeroencvlier")
-
-print("Total: %d GiB" % (total // (2**30)))
-print("Used: %d GiB" % (used // (2**30)))
-print("Free: %d GiB" % (free // (2**30)))
-
+if __name__ == "__main__":
+    local_rsync()
