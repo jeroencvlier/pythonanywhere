@@ -1,10 +1,11 @@
 import subprocess
-from src.utils import fetch_weeks_cloud
-from src import telegram_bot
+from utils import fetch_weeks_cloud
+import telegram_bot
 
 
 def local_rsync():
-    cloud_weeks = fetch_weeks_cloud()
+    last_week = False
+    cloud_weeks = fetch_weeks_cloud(last_week)
 
     for week in cloud_weeks:
         message = f"Pulling Option Data for {cloud_weeks}!\n"
