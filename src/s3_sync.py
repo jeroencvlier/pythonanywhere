@@ -1,5 +1,5 @@
 import subprocess
-import os
+import sys
 
 # import telegram_bot
 import telegram_bot
@@ -96,3 +96,4 @@ if __name__ == "__main__":
     message += storage_check()
     # send telegram message
     telegram_bot.send_mess(message)
+    sys.exit(0)
