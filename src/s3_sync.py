@@ -3,7 +3,7 @@ import os
 
 # import telegram_bot
 from src import telegram_bot
-
+from src.utils import fetch_weeks_cloud
 
 # def count_files_uploaded(output):
 #     count = 0
@@ -18,23 +18,9 @@ def count_files_uploaded(output):
     return output.count("upload:")
 
 
-def fetch_last_week(datapath="/home/jeroencvlier/option_chain_data/"):
-    list_of_options_per_week_on_cloud = os.listdir(datapath)
-    list_of_options_per_week_on_cloud = [
-        x for x in list_of_options_per_week_on_cloud if "_week_" in x
-    ]
-    list_of_options_per_week_on_cloud = sorted(
-        list_of_options_per_week_on_cloud, reverse=True
-    )
-    latest_week = list_of_options_per_week_on_cloud[0]
-
-    return latest_week
-
-
 def aws_sync():
-    week = fetch_last_week()
+    week = fetch_weeks_cloud()
     total_files_uploaded = 0
-    subprocess_errors = ""
     message = f"Pulling Option Data for {week}!"
     print(message)
     aws_command = [
