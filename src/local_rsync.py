@@ -1,16 +1,23 @@
 import subprocess
-from utils import fetch_weeks_cloud
 import telegram_bot
 
 
 def local_rsync():
-    last_week = False
-    cloud_weeks = fetch_weeks_cloud(last_week)
-
-    for week in cloud_weeks:
-        message = f"Pulling Option Data for {cloud_weeks}!\n"
+    list_of_options_per_week_on_cloud = subprocess.check_output(
+        [
+            "ssh",
+            "jeroencvlier@ssh.pythonanywhere.com",
+            "ls",
+            "/home/jeroencvlier/option_chain_data/",
+        ]
+    )
+    list_of_options_per_week_on_cloud = [
+        x for x in list_of_options_per_week_on_cloud.decode().split() if "_week_" in x
+    ]
+    for week in sorted(list_of_options_per_week_on_cloud, reverse=True):
+        message = f"Pulling Option Data for {week}!\n"
         try:
-            result = subprocess.call(
+            result = subprocess.check_output(
                 [
                     "rsync",
                     "-avzhe",
@@ -20,8 +27,6 @@ def local_rsync():
                     + "/",
                     "/Users/jeroenvanlier/Documents/Github/TOS_predition/option_chain_data",
                 ],
-                capture_output=True,
-                text=True,
             )
             output = result.stdout
 
@@ -32,7 +37,7 @@ def local_rsync():
                     message += f"Total files transferred: {total_files}\n\n"
 
         except Exception as error:
-            message += f"Error: " + str(error.stderr)[:200] + "\n\n"
+            message += f"Error: " + str(error)[:200] + "\n\n"
 
     telegram_bot.send_mess(message)
 
