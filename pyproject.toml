@@ -28,3 +28,23 @@ exclude = '''
 
 [tool.isort]
 profile = "black"
+
+[tool.poetry]
+name = "python-anywhere" 
+version = "0.1.0"  
+description = "A short description of your project"
+authors = ["Jeroen <jeroencvlier@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"  # Specify required Python version
+# List other project dependencies here
+awscli = "1.32.23"
+colorama = "0.4.4"
+pytelegrambotapi = "4.15.2"
+python-dotenv = "1.0.0"
+ipykernel = "^6.29.2"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+ipykernel = "^6.29.2"
+

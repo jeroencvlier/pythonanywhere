@@ -1,5 +1,6 @@
 import os
 
+
 def fetch_weeks_cloud(
     last_week: bool, datapath: str = "/home/jeroencvlier/option_chain_data/"
 ):
@@ -11,7 +12,7 @@ def fetch_weeks_cloud(
         list_of_options_per_week_on_cloud, reverse=True
     )
     if last_week:
-        result_week = list_of_options_per_week_on_cloud[0]
+        result_week = [list_of_options_per_week_on_cloud[0]]
     else:
         result_week = list_of_options_per_week_on_cloud
 
