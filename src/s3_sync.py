@@ -3,8 +3,9 @@ import sys
 import datetime as dt
 
 # import telegram_bot
-from src import telegram_bot
-from src.utils import fetch_weeks_cloud
+
+import telegram_bot
+from utils import fetch_weeks_cloud
 
 # def count_files_uploaded(output):
 #     count = 0
