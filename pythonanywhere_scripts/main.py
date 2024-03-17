@@ -1,6 +1,7 @@
 import os
 import logging
-import local_rsync, s3_sync
+
+from pythonanywhere_scripts import local_rsync, s3_sync
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 

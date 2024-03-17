@@ -16,6 +16,13 @@ $ workon pyany
 $ pip install -r requirements.txt
 ```
 
+
+```bash
+curl -L -o pythonanywhere_scripts-0.1.6-py3-none-any.whl  "https://github.com/jeroencvlier/pythonanywhere-scripts/releases/download/v0.1.6/pythonanywhere_scripts-0.1.6-py3-none-any.whl"
+pip install pythonanywhere_scripts-0.1.6-py3-none-any.whl
+
+```
+
 Be sure to have the environment variables set in the .env file
 
 To use the local sync, supply the cronjob with the correct path to the script
