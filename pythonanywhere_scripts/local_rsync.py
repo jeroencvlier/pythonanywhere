@@ -23,7 +23,7 @@ def local_rsync():
     for week in sorted(list_of_options_per_week_on_cloud, reverse=True):
 
         try:
-            logging.info(f"Pulling Option Data for {week}!")
+            logging.info    (f"Pulling Option Data for {week}!")
             # result = subprocess.run(
             #     [
             #         "rsync",
