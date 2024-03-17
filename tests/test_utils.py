@@ -1,6 +1,6 @@
 import os
 import shutil
-from src.utils import fetch_weeks_cloud
+from pythonanywhere_scripts.utils import fetch_weeks_cloud
 
 
 def create_test_files():
@@ -28,7 +28,7 @@ def test_fetch_last_week():
     result_week = fetch_weeks_cloud(last_week, temp_dir)
 
     # Assert that the result is the latest week file
-    assert result_week == "2024_week_03"
+    assert result_week == ["2024_week_03"]
 
     # Clean up the temporary directory
     shutil.rmtree(temp_dir)

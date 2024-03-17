@@ -1,4 +1,4 @@
-from src.s3_sync import is_weekday
+from pythonanywhere_scripts.s3_sync import is_weekday
 import datetime as dt
 
 
