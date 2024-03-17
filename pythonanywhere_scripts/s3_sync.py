@@ -1,12 +1,14 @@
 import subprocess
 import sys
 import datetime as dt
+import logging
 
 # import telegram_bot
 
 from pythonanywhere_scripts import telegram_bot
 from pythonanywhere_scripts.utils import fetch_weeks_cloud
 from pythonanywhere_scripts.utils import storage_check
+
 # def count_files_uploaded(output):
 #     count = 0
 #     lines = output.split("\n")
@@ -15,9 +17,16 @@ from pythonanywhere_scripts.utils import storage_check
 #             count += 1
 #     return count
 
+logging.basicConfig(
+    filename="/home/jeroencvlier/option_chain_data/s3_sync.log",
+    level=logging.INFO,
+    format="%(asctime)s:%(levelname)s:%(message)s",
+)
+
 
 # check if is is weekday or weekend
 def is_weekday(todays_date):
+    logging.info(f"Today's date: {todays_date}")
     return todays_date.weekday() < 5
 
 
@@ -65,12 +74,6 @@ def aws_sync():
         message = f"Total files uploaded: {total_files_uploaded}"
 
     return message
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
