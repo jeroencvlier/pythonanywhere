@@ -30,7 +30,7 @@ exclude = '''
 profile = "black"
 
 [tool.poetry]
-name = "python-anywhere" 
+name = "pythonanywhere_scripts" 
 version = "0.1.0"  
 description = "A short description of your project"
 authors = ["Jeroen <jeroencvlier@gmail.com>"]
@@ -43,8 +43,13 @@ colorama = "0.4.4"
 pytelegrambotapi = "4.15.2"
 python-dotenv = "1.0.0"
 ipykernel = "^6.29.2"
+pytest = "^8.0.2"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
 ipykernel = "^6.29.2"
+
+[tool.poetry.scripts]
+pythonanywhere-sync = "pythonanywhere_scripts.main:main"
+
 

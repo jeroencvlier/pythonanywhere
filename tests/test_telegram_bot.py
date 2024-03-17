@@ -1,4 +1,4 @@
-from src import telegram_bot
+from pythonanywhere_scripts import telegram_bot
 
 
 def test_send_mess_blank():
