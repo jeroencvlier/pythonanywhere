@@ -1,7 +1,9 @@
 import os
 import logging
 
-from pythonanywhere_scripts import local_rsync, s3_sync
+from pythonanywhere_scripts.local_rsync import local_rsync
+from pythonanywhere_scripts.s3_sync import aws_sync
+
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
@@ -15,7 +17,7 @@ def main():
     """Run the appropriate sync function based on the environment."""
     if is_running_on_pythonanywhere():
         logging.info("Running on PythonAnywhere.")
-        s3_sync()
+        aws_sync()
     else:
         logging.info("Running locally or on another environment.")
         local_rsync()
