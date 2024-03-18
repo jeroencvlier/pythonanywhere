@@ -31,7 +31,7 @@ profile = "black"
 
 [tool.poetry]
 name = "pythonanywhere_scripts" 
-version = "0.2.0"  
+version = "0.2.1"  
 description = "A short description of your project"
 authors = ["Jeroen <jeroencvlier@gmail.com>"]
 
