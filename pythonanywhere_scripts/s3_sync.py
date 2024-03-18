@@ -14,8 +14,8 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
 
 # check if is is weekday or weekend
-def is_weekday():
-    return dt.datetime.today().weekday() < 5
+def is_weekday(todays_date=dt.datetime.today()):
+    return todays_date.weekday() < 5
 
 
 def count_files_uploaded(output):
