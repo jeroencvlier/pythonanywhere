@@ -1,24 +1,21 @@
 import subprocess
 import sys
 import datetime as dt
+import logging
 
 # import telegram_bot
+import time
 
 from pythonanywhere_scripts import telegram_bot
 from pythonanywhere_scripts.utils import fetch_weeks_cloud
 from pythonanywhere_scripts.utils import storage_check
-# def count_files_uploaded(output):
-#     count = 0
-#     lines = output.split("\n")
-#     for line in lines:
-#         if "upload:" in line:
-#             count += 1
-#     return count
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(message)s")
 
 
 # check if is is weekday or weekend
-def is_weekday(todays_date):
-    return todays_date.weekday() < 5
+def is_weekday():
+    return dt.datetime.today().weekday() < 5
 
 
 def count_files_uploaded(output):
@@ -26,23 +23,23 @@ def count_files_uploaded(output):
 
 
 def aws_sync():
-    todays_date = dt.datetime.today()
-    week_list = fetch_weeks_cloud(last_week=is_weekday(todays_date))
+    start_time = time.time()
+    week_list = fetch_weeks_cloud(pull_latest_week_only=is_weekday())
+    total_files_uploaded = 0
     for week in week_list:
-        total_files_uploaded = 0
         message = f"Pulling Option Data for {week}!"
-        print(message)
+        logging.info(message)
         aws_command = [
             "/home/jeroencvlier/.virtualenvs/awssync/bin/aws",
             "s3",
             "sync",
             f"/home/jeroencvlier/option_chain_data/{week}/",
             "s3://option-chain-data-backup/option_chain_data",
-            "--size-only",
-            "--exclude",
-            '"*"',
-            "--include",
-            "*.json.gz",
+            # "--size-only",
+            # "--exclude",
+            # '"*"',
+            # "--include",
+            # "*.json.gz",
             "--profile",
             "default",
         ]
@@ -55,22 +52,30 @@ def aws_sync():
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
             )
-            total_files_uploaded += count_files_uploaded(result.stdout)
 
-        except subprocess.CalledProcessError as error:
-            print("Error:")
-            print(error.stderr)
-            message += f"\nError: " + str(error.stderr)[:200]
+            # Parsing rsync output for the number of files transferred
+            week_file_count = 0
 
-        message = f"Total files uploaded: {total_files_uploaded}"
+            for line in result.stdout.split("\n"):
+                if line.strip().endswith(".json.gz"):
+                    week_file_count += 1
+                    total_files_uploaded += 1
+
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Rsync failed for {week}: {e}")
+            message += f"\n\nError {week}: " + str(e)[:200] + "\n\n"
+
+        # send tim ein HH:mm:ss format and remove milliseconds
+        message += f"\n\nTotal time taken for : {str(dt.timedelta(seconds=(time.time() - start_time)))[:-7]} HH:mm:ss"
+        message += f"\nTotal files uploaded: {total_files_uploaded}"
+        message += storage_check()
+        try:
+            telegram_bot.send_mess(message)
+        except Exception as error:
+            logging.error("Failed to send message to telegram.")
+            logging.error(error)
 
     return message
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
@@ -80,4 +85,3 @@ if __name__ == "__main__":
     message += storage_check()
     # send telegram message
     telegram_bot.send_mess(message)
-    sys.exit(0)
