@@ -18,8 +18,8 @@ $ pip install -r requirements.txt
 
 
 ```bash
-curl -L -o pythonanywhere_scripts-0.2.0-py3-none-any.whl  "https://github.com/jeroencvlier/pythonanywhere-scripts/releases/download/v0.2.0/pythonanywhere_scripts-0.2.0-py3-none-any.whl"
-pip install pythonanywhere_scripts-0.2.0-py3-none-any.whl
+curl -L -o pythonanywhere_scripts-0.2.1-py3-none-any.whl  "https://github.com/jeroencvlier/pythonanywhere-scripts/releases/download/v0.2.1/pythonanywhere_scripts-0.2.1-py3-none-any.whl"
+pip install pythonanywhere_scripts-0.2.1-py3-none-any.whl
 
 ```
 

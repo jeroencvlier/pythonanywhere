@@ -50,6 +50,6 @@ pytest = "^8.0.0"
 ipykernel = "^6.29.2"
 
 [tool.poetry.scripts]
-pythonanywhere-sync = "pythonanywhere_scripts.main:main"
+pythonanywhere_sync = "pythonanywhere_scripts.main:main"
 
 
