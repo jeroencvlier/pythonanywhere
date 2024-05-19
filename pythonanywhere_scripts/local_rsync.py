@@ -73,3 +73,7 @@ def local_rsync():
     message += f"Total files Synced: {total_files}"
 
     telegram_bot.send_mess(message)
+
+
+if __name__ == "__main__":
+    local_rsync()
